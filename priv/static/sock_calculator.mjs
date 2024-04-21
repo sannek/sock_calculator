@@ -40,10 +40,10 @@ var List = class {
     return desired === 0;
   }
   countLength() {
-    let length3 = 0;
+    let length2 = 0;
     for (let _ of this)
-      length3++;
-    return length3;
+      length2++;
+    return length2;
   }
 };
 function prepend(element2, tail) {
@@ -323,6 +323,14 @@ function try$(result, fun) {
   } else {
     let e = result[0];
     return new Error(e);
+  }
+}
+function unwrap(result, default$) {
+  if (result.isOk()) {
+    let v = result[0];
+    return v;
+  } else {
+    return default$;
   }
 }
 
@@ -1125,28 +1133,15 @@ var NOT_FOUND = {};
 function identity(x) {
   return x;
 }
+function parse_int(value3) {
+  if (/^[-+]?(\d+)$/.test(value3)) {
+    return new Ok(parseInt(value3));
+  } else {
+    return new Error(Nil);
+  }
+}
 function to_string3(term) {
   return term.toString();
-}
-function string_length(string3) {
-  if (string3 === "") {
-    return 0;
-  }
-  const iterator = graphemes_iterator(string3);
-  if (iterator) {
-    let i = 0;
-    for (const _ of iterator) {
-      i++;
-    }
-    return i;
-  } else {
-    return string3.match(/./gsu).length;
-  }
-}
-function graphemes_iterator(string3) {
-  if (Intl && Intl.Segmenter) {
-    return new Intl.Segmenter().segment(string3)[Symbol.iterator]();
-  }
 }
 function concat(xs) {
   let result = "";
@@ -1224,13 +1219,11 @@ function try_get_field(value3, field4, or_else) {
 }
 
 // build/dev/javascript/gleam_stdlib/gleam/int.mjs
+function parse(string3) {
+  return parse_int(string3);
+}
 function to_string2(x) {
   return to_string3(x);
-}
-
-// build/dev/javascript/gleam_stdlib/gleam/string.mjs
-function length2(string3) {
-  return string_length(string3);
 }
 
 // build/dev/javascript/gleam_stdlib/gleam/bool.mjs
@@ -2085,36 +2078,35 @@ var input3 = input2;
 
 // build/dev/javascript/sock_calculator/sock_calculator.mjs
 var Model = class extends CustomType {
-  constructor(value3, length3, max2) {
+  constructor(value3, length2, max2, stitch_count) {
     super();
     this.value = value3;
-    this.length = length3;
+    this.length = length2;
     this.max = max2;
+    this.stitch_count = stitch_count;
   }
 };
-var UserUpdatedMessage = class extends CustomType {
+var UserUpdatedStitchCount = class extends CustomType {
   constructor(value3) {
     super();
     this.value = value3;
   }
 };
-var UserResetMessage = class extends CustomType {
+var UserResetStitchCount = class extends CustomType {
 };
 function init2(_) {
-  return new Model("", 0, 10);
+  return new Model("", 0, 10, 60);
 }
 function update2(model, msg) {
-  if (msg instanceof UserUpdatedMessage) {
+  if (msg instanceof UserUpdatedStitchCount) {
     let value3 = msg.value;
-    let length3 = length2(value3);
-    let $ = length3 <= model.max;
-    if ($) {
-      return model.withFields({ value: value3, length: length3 });
-    } else {
-      return model;
-    }
+    let stitch_count = (() => {
+      let _pipe = parse(value3);
+      return unwrap(_pipe, 0);
+    })();
+    return model.withFields({ stitch_count });
   } else {
-    return model.withFields({ value: "", length: 0 });
+    return model.withFields({ stitch_count: 60 });
   }
 }
 function view(model) {
@@ -2123,27 +2115,29 @@ function view(model) {
     ["height", "100vh"],
     ["padding", "1rem"]
   ]);
-  let length3 = to_string2(model.length);
-  let max2 = to_string2(model.max);
+  let stitch_count = to_string2(model.stitch_count);
   return centre2(
     toList([style(styles)]),
     aside2(
       toList([content_first(), align_centre()]),
       field3(
         toList([]),
-        toList([text("Write a message:")]),
+        toList([text("How many stitches is your sock?")]),
         input3(
           toList([
-            value(model.value),
-            on_input((var0) => {
-              return new UserUpdatedMessage(var0);
-            })
+            type_("number"),
+            value(stitch_count),
+            on_input(
+              (var0) => {
+                return new UserUpdatedStitchCount(var0);
+              }
+            )
           ])
         ),
-        toList([text(length3 + "/" + max2)])
+        toList([])
       ),
       button3(
-        toList([on_click(new UserResetMessage())]),
+        toList([on_click(new UserResetStitchCount())]),
         toList([text("Reset")])
       )
     )
@@ -2156,7 +2150,7 @@ function main() {
     throw makeError(
       "assignment_no_match",
       "sock_calculator",
-      14,
+      15,
       "main",
       "Assignment pattern did not match",
       { value: $ }

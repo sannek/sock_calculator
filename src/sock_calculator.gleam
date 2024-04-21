@@ -1,4 +1,5 @@
 import gleam/int
+import gleam/result
 import gleam/string
 import lustre
 import lustre/attribute
@@ -17,31 +18,29 @@ pub fn main() {
 // MODEL -----------------------------------------------------------------------
 
 type Model {
-  Model(value: String, length: Int, max: Int)
+  Model(value: String, length: Int, max: Int, stitch_count: Int)
 }
 
 fn init(_flags) -> Model {
-  Model(value: "", length: 0, max: 10)
+  Model(value: "", length: 0, max: 10, stitch_count: 60)
 }
 
 // UPDATE ----------------------------------------------------------------------
 
 pub opaque type Msg {
-  UserUpdatedMessage(value: String)
-  UserResetMessage
+  UserUpdatedStitchCount(value: String)
+  UserResetStitchCount
 }
 
 fn update(model: Model, msg: Msg) -> Model {
   case msg {
-    UserUpdatedMessage(value) -> {
-      let length = string.length(value)
-
-      case length <= model.max {
-        True -> Model(..model, value: value, length: length)
-        False -> model
-      }
+    UserUpdatedStitchCount(value) -> {
+      let stitch_count =
+        int.parse(value)
+        |> result.unwrap(0)
+      Model(..model, stitch_count: stitch_count)
     }
-    UserResetMessage -> Model(..model, value: "", length: 0)
+    UserResetStitchCount -> Model(..model, stitch_count: 60)
   }
 }
 
@@ -49,8 +48,8 @@ fn update(model: Model, msg: Msg) -> Model {
 
 fn view(model: Model) -> Element(Msg) {
   let styles = [#("width", "100vw"), #("height", "100vh"), #("padding", "1rem")]
-  let length = int.to_string(model.length)
-  let max = int.to_string(model.max)
+
+  let stitch_count = int.to_string(model.stitch_count)
 
   ui.centre(
     [attribute.style(styles)],
@@ -58,14 +57,15 @@ fn view(model: Model) -> Element(Msg) {
       [aside.content_first(), aside.align_centre()],
       ui.field(
         [],
-        [element.text("Write a message:")],
+        [element.text("How many stitches is your sock?")],
         ui.input([
-          attribute.value(model.value),
-          event.on_input(UserUpdatedMessage),
+          attribute.type_("number"),
+          attribute.value(stitch_count),
+          event.on_input(UserUpdatedStitchCount),
         ]),
-        [element.text(length <> "/" <> max)],
+        [],
       ),
-      ui.button([event.on_click(UserResetMessage)], [element.text("Reset")]),
+      ui.button([event.on_click(UserResetStitchCount)], [element.text("Reset")]),
     ),
   )
 }
