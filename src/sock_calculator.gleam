@@ -30,8 +30,9 @@ fn init(_flags) -> #(Model, Effect(Msg)) {
 
 pub opaque type Msg {
   UserUpdatedStitchCount(value: String)
-  UserSubmittedStitchCount(value: String)
+  UserSubmittedStitchCount
   UserResetStitchCount
+  GotSubmittedStitchCount(value: Result(String, Nil))
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -39,7 +40,14 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     UserUpdatedStitchCount(value) -> {
       #(Model(..model, stitch_count_input: value), effect.none())
     }
-    UserSubmittedStitchCount(value) -> {
+    UserSubmittedStitchCount -> {
+      #(model, get_stitch_count())
+    }
+    UserResetStitchCount -> #(
+      Model(stitch_count: 60, stitch_count_input: "60"),
+      effect.none(),
+    )
+    GotSubmittedStitchCount(Ok(value)) -> {
       let stitch_count =
         int.parse(value)
         |> result.unwrap(60)
@@ -48,10 +56,9 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         effect.none(),
       )
     }
-    UserResetStitchCount -> #(
-      Model(stitch_count: 60, stitch_count_input: "60"),
-      effect.none(),
-    )
+    GotSubmittedStitchCount(Error(_)) -> {
+      #(model, effect.none())
+    }
   }
 }
 
@@ -76,13 +83,26 @@ fn view(model: Model) -> Element(Msg) {
           ]),
           [],
         ),
-        ui.button([event.on_click(UserResetStitchCount)], [
-          element.text("Reset"),
+        ui.button([event.on_click(UserSubmittedStitchCount)], [
+          element.text("Calculate"),
         ]),
       ),
       heel_instructions(model.stitch_count),
     ]),
   )
+}
+
+fn get_stitch_count() -> Effect(Msg) {
+  effect.from(fn(dispatch) {
+    do_get_stitch_count()
+    |> GotSubmittedStitchCount
+    |> dispatch
+  })
+}
+
+@external(javascript, "./sock_calculator.ffi.mjs", "get_stitch_count")
+fn do_get_stitch_count() -> Result(String, Nil) {
+  Error(Nil)
 }
 
 // VIEW HELPERS ------------------------------------------------------------------------
