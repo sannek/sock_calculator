@@ -70,8 +70,9 @@ fn view(model: Model) -> Element(Msg) {
   ui.centre(
     [attribute.style(styles)],
     ui.stack([], [
+      html.h1([], [element.text("Let's knit a sock!")]),
       ui.aside(
-        [aside.content_first(), aside.align_centre()],
+        [aside.content_first(), aside.align_end()],
         ui.field(
           [],
           [element.text("How many stitches?")],
