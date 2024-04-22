@@ -1305,6 +1305,9 @@ function style(properties) {
 function class$(name) {
   return attribute("class", name);
 }
+function id(name) {
+  return attribute("id", name);
+}
 function type_(name) {
   return attribute("type", name);
 }
@@ -1375,9 +1378,9 @@ var ForceModel = class extends CustomType {
 // build/dev/javascript/lustre/vdom.ffi.mjs
 function morph(prev, next, dispatch, isComponent = false) {
   let out;
-  let stack2 = [{ prev, next, parent: prev.parentNode }];
-  while (stack2.length) {
-    let { prev: prev2, next: next2, parent } = stack2.pop();
+  let stack3 = [{ prev, next, parent: prev.parentNode }];
+  while (stack3.length) {
+    let { prev: prev2, next: next2, parent } = stack3.pop();
     if (next2.subtree !== void 0)
       next2 = next2.subtree();
     if (next2.content !== void 0) {
@@ -1399,7 +1402,7 @@ function morph(prev, next, dispatch, isComponent = false) {
         prev: prev2,
         next: next2,
         dispatch,
-        stack: stack2,
+        stack: stack3,
         isComponent
       });
       if (!prev2) {
@@ -1412,7 +1415,7 @@ function morph(prev, next, dispatch, isComponent = false) {
   }
   return out;
 }
-function createElementNode({ prev, next, dispatch, stack: stack2 }) {
+function createElementNode({ prev, next, dispatch, stack: stack3 }) {
   const namespace = next.namespace || "http://www.w3.org/1999/xhtml";
   const canMorph = prev && prev.nodeType === Node.ELEMENT_NODE && prev.localName === next.tag && prev.namespaceURI === (next.namespace || "http://www.w3.org/1999/xhtml");
   const el2 = canMorph ? prev : namespace ? document.createElementNS(namespace, next.tag) : document.createElement(next.tag);
@@ -1511,36 +1514,36 @@ function createElementNode({ prev, next, dispatch, stack: stack2 }) {
         prevChild = nextChild;
       }
       if (keyedChildren.size === 0) {
-        stack2.unshift({ prev: prevChild, next: child, parent: el2 });
+        stack3.unshift({ prev: prevChild, next: child, parent: el2 });
         prevChild = prevChild?.nextSibling;
         continue;
       }
       if (seenKeys.has(child.key)) {
         console.warn(`Duplicate key found in Lustre vnode: ${child.key}`);
-        stack2.unshift({ prev: null, next: child, parent: el2 });
+        stack3.unshift({ prev: null, next: child, parent: el2 });
         continue;
       }
       seenKeys.add(child.key);
       const keyedChild = keyedChildren.get(child.key);
       if (!keyedChild && !prevChild) {
-        stack2.unshift({ prev: null, next: child, parent: el2 });
+        stack3.unshift({ prev: null, next: child, parent: el2 });
         continue;
       }
       if (!keyedChild && prevChild !== null) {
         const placeholder = document.createTextNode("");
         el2.insertBefore(placeholder, prevChild);
-        stack2.unshift({ prev: placeholder, next: child, parent: el2 });
+        stack3.unshift({ prev: placeholder, next: child, parent: el2 });
         continue;
       }
       if (!keyedChild || keyedChild === prevChild) {
-        stack2.unshift({ prev: prevChild, next: child, parent: el2 });
+        stack3.unshift({ prev: prevChild, next: child, parent: el2 });
         prevChild = prevChild?.nextSibling;
         continue;
       }
       el2.insertBefore(keyedChild, prevChild);
-      stack2.unshift({ prev: keyedChild, next: child, parent: el2 });
+      stack3.unshift({ prev: keyedChild, next: child, parent: el2 });
     } else {
-      stack2.unshift({ prev: prevChild, next: child, parent: el2 });
+      stack3.unshift({ prev: prevChild, next: child, parent: el2 });
       prevChild = prevChild?.nextSibling;
     }
   }
@@ -1777,6 +1780,26 @@ function start3(app, selector, flags) {
   );
 }
 
+// build/dev/javascript/lustre/lustre/element/html.mjs
+function div(attrs, children) {
+  return element("div", attrs, children);
+}
+function p(attrs, children) {
+  return element("p", attrs, children);
+}
+function span(attrs, children) {
+  return element("span", attrs, children);
+}
+function button(attrs, children) {
+  return element("button", attrs, children);
+}
+function input(attrs) {
+  return element("input", attrs, toList([]));
+}
+function label(attrs, children) {
+  return element("label", attrs, children);
+}
+
 // build/dev/javascript/lustre/lustre/event.mjs
 function on2(name, handler) {
   return on(name, handler);
@@ -1802,23 +1825,6 @@ function on_input(msg) {
   );
 }
 
-// build/dev/javascript/lustre/lustre/element/html.mjs
-function div(attrs, children) {
-  return element("div", attrs, children);
-}
-function span(attrs, children) {
-  return element("span", attrs, children);
-}
-function button(attrs, children) {
-  return element("button", attrs, children);
-}
-function input(attrs) {
-  return element("input", attrs, toList([]));
-}
-function label(attrs, children) {
-  return element("label", attrs, children);
-}
-
 // build/dev/javascript/lustre_ui/lustre/ui/button.mjs
 function button2(attributes, children) {
   return button(
@@ -1836,6 +1842,9 @@ function of(element2, attributes, children) {
     prepend(class$("lustre-ui-stack"), attributes),
     children
   );
+}
+function stack(attributes, children) {
+  return of(div, attributes, children);
 }
 function packed() {
   return class$("packed");
@@ -1893,6 +1902,17 @@ function of4(element2, attributes, children) {
 }
 function centre(attributes, children) {
   return of4(div, attributes, children);
+}
+
+// build/dev/javascript/lustre_ui/lustre/ui/prose.mjs
+function of5(element2, attributes, children) {
+  return element2(
+    prepend(class$("lustre-ui-prose"), attributes),
+    children
+  );
+}
+function prose(attributes, children) {
+  return of5(div, attributes, children);
 }
 
 // build/dev/javascript/gleam_community_colour/gleam_community/colour.mjs
@@ -2075,15 +2095,15 @@ var button3 = button2;
 var centre2 = centre;
 var field3 = field2;
 var input3 = input2;
+var prose2 = prose;
+var stack2 = stack;
 
 // build/dev/javascript/sock_calculator/sock_calculator.mjs
 var Model = class extends CustomType {
-  constructor(value3, length2, max2, stitch_count) {
+  constructor(stitch_count, stitch_count_input) {
     super();
-    this.value = value3;
-    this.length = length2;
-    this.max = max2;
     this.stitch_count = stitch_count;
+    this.stitch_count_input = stitch_count_input;
   }
 };
 var UserUpdatedStitchCount = class extends CustomType {
@@ -2092,22 +2112,43 @@ var UserUpdatedStitchCount = class extends CustomType {
     this.value = value3;
   }
 };
+var UserSubmittedStitchCount = class extends CustomType {
+  constructor(value3) {
+    super();
+    this.value = value3;
+  }
+};
 var UserResetStitchCount = class extends CustomType {
 };
 function init2(_) {
-  return new Model("", 0, 10, 60);
+  return new Model(60, "60");
 }
 function update2(model, msg) {
   if (msg instanceof UserUpdatedStitchCount) {
     let value3 = msg.value;
+    return model.withFields({ stitch_count_input: value3 });
+  } else if (msg instanceof UserSubmittedStitchCount) {
+    let value3 = msg.value;
     let stitch_count = (() => {
       let _pipe = parse(value3);
-      return unwrap(_pipe, 0);
+      return unwrap(_pipe, 60);
     })();
-    return model.withFields({ stitch_count });
+    return new Model(stitch_count, value3);
   } else {
-    return model.withFields({ stitch_count: 60 });
+    return new Model(60, "60");
   }
+}
+function heel_instructions(stitch_count) {
+  let str_count = to_string2(stitch_count);
+  return prose2(
+    toList([]),
+    toList([
+      p(
+        toList([]),
+        toList([text("Hello " + str_count + " stitch sock.")])
+      )
+    ])
+  );
 }
 function view(model) {
   let styles = toList([
@@ -2115,31 +2156,37 @@ function view(model) {
     ["height", "100vh"],
     ["padding", "1rem"]
   ]);
-  let stitch_count = to_string2(model.stitch_count);
   return centre2(
     toList([style(styles)]),
-    aside2(
-      toList([content_first(), align_centre()]),
-      field3(
-        toList([]),
-        toList([text("How many stitches is your sock?")]),
-        input3(
-          toList([
-            type_("number"),
-            value(stitch_count),
-            on_input(
-              (var0) => {
-                return new UserUpdatedStitchCount(var0);
-              }
-            )
-          ])
+    stack2(
+      toList([]),
+      toList([
+        aside2(
+          toList([content_first(), align_centre()]),
+          field3(
+            toList([]),
+            toList([text("How many stitches?")]),
+            input3(
+              toList([
+                id("stitch-count"),
+                type_("number"),
+                value(model.stitch_count_input),
+                on_input(
+                  (var0) => {
+                    return new UserUpdatedStitchCount(var0);
+                  }
+                )
+              ])
+            ),
+            toList([])
+          ),
+          button3(
+            toList([on_click(new UserResetStitchCount())]),
+            toList([text("Reset")])
+          )
         ),
-        toList([])
-      ),
-      button3(
-        toList([on_click(new UserResetStitchCount())]),
-        toList([text("Reset")])
-      )
+        heel_instructions(model.stitch_count)
+      ])
     )
   );
 }

@@ -1,9 +1,9 @@
 import gleam/int
 import gleam/result
-import gleam/string
 import lustre
 import lustre/attribute
 import lustre/element.{type Element}
+import lustre/element/html
 import lustre/event
 import lustre/ui
 import lustre/ui/layout/aside
@@ -18,29 +18,33 @@ pub fn main() {
 // MODEL -----------------------------------------------------------------------
 
 type Model {
-  Model(value: String, length: Int, max: Int, stitch_count: Int)
+  Model(stitch_count: Int, stitch_count_input: String)
 }
 
 fn init(_flags) -> Model {
-  Model(value: "", length: 0, max: 10, stitch_count: 60)
+  Model(stitch_count: 60, stitch_count_input: "60")
 }
 
 // UPDATE ----------------------------------------------------------------------
 
 pub opaque type Msg {
   UserUpdatedStitchCount(value: String)
+  UserSubmittedStitchCount(value: String)
   UserResetStitchCount
 }
 
 fn update(model: Model, msg: Msg) -> Model {
   case msg {
     UserUpdatedStitchCount(value) -> {
+      Model(..model, stitch_count_input: value)
+    }
+    UserSubmittedStitchCount(value) -> {
       let stitch_count =
         int.parse(value)
-        |> result.unwrap(0)
-      Model(..model, stitch_count: stitch_count)
+        |> result.unwrap(60)
+      Model(stitch_count: stitch_count, stitch_count_input: value)
     }
-    UserResetStitchCount -> Model(..model, stitch_count: 60)
+    UserResetStitchCount -> Model(stitch_count: 60, stitch_count_input: "60")
   }
 }
 
@@ -49,23 +53,36 @@ fn update(model: Model, msg: Msg) -> Model {
 fn view(model: Model) -> Element(Msg) {
   let styles = [#("width", "100vw"), #("height", "100vh"), #("padding", "1rem")]
 
-  let stitch_count = int.to_string(model.stitch_count)
-
   ui.centre(
     [attribute.style(styles)],
-    ui.aside(
-      [aside.content_first(), aside.align_centre()],
-      ui.field(
-        [],
-        [element.text("How many stitches is your sock?")],
-        ui.input([
-          attribute.type_("number"),
-          attribute.value(stitch_count),
-          event.on_input(UserUpdatedStitchCount),
+    ui.stack([], [
+      ui.aside(
+        [aside.content_first(), aside.align_centre()],
+        ui.field(
+          [],
+          [element.text("How many stitches?")],
+          ui.input([
+            attribute.id("stitch-count"),
+            attribute.type_("number"),
+            attribute.value(model.stitch_count_input),
+            event.on_input(UserUpdatedStitchCount),
+          ]),
+          [],
+        ),
+        ui.button([event.on_click(UserResetStitchCount)], [
+          element.text("Reset"),
         ]),
-        [],
       ),
-      ui.button([event.on_click(UserResetStitchCount)], [element.text("Reset")]),
-    ),
+      heel_instructions(model.stitch_count),
+    ]),
   )
+}
+
+// VIEW HELPERS ------------------------------------------------------------------------
+
+fn heel_instructions(stitch_count: Int) -> Element(Msg) {
+  let str_count = int.to_string(stitch_count)
+  ui.prose([], [
+    html.p([], [element.text("Hello " <> str_count <> " stitch sock.")]),
+  ])
 }
