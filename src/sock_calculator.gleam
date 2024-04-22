@@ -2,6 +2,7 @@ import gleam/int
 import gleam/result
 import lustre
 import lustre/attribute
+import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
@@ -11,7 +12,7 @@ import lustre/ui/layout/aside
 // MAIN ------------------------------------------------------------------------
 
 pub fn main() {
-  let app = lustre.simple(init, update, view)
+  let app = lustre.application(init, update, view)
   let assert Ok(_) = lustre.start(app, "#app", Nil)
 }
 
@@ -21,8 +22,8 @@ type Model {
   Model(stitch_count: Int, stitch_count_input: String)
 }
 
-fn init(_flags) -> Model {
-  Model(stitch_count: 60, stitch_count_input: "60")
+fn init(_flags) -> #(Model, Effect(Msg)) {
+  #(Model(stitch_count: 60, stitch_count_input: "60"), effect.none())
 }
 
 // UPDATE ----------------------------------------------------------------------
@@ -33,18 +34,24 @@ pub opaque type Msg {
   UserResetStitchCount
 }
 
-fn update(model: Model, msg: Msg) -> Model {
+fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
     UserUpdatedStitchCount(value) -> {
-      Model(..model, stitch_count_input: value)
+      #(Model(..model, stitch_count_input: value), effect.none())
     }
     UserSubmittedStitchCount(value) -> {
       let stitch_count =
         int.parse(value)
         |> result.unwrap(60)
-      Model(stitch_count: stitch_count, stitch_count_input: value)
+      #(
+        Model(stitch_count: stitch_count, stitch_count_input: value),
+        effect.none(),
+      )
     }
-    UserResetStitchCount -> Model(stitch_count: 60, stitch_count_input: "60")
+    UserResetStitchCount -> #(
+      Model(stitch_count: 60, stitch_count_input: "60"),
+      effect.none(),
+    )
   }
 }
 
