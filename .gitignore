@@ -2,4 +2,5 @@
 *.ez
 /build
 /priv
+/prod
 erl_crash.dump
