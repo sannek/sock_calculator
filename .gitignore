@@ -2,5 +2,5 @@
 *.ez
 .DS_Store
 /build
-/prod
+/dist
 erl_crash.dump
