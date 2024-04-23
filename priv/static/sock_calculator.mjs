@@ -2222,7 +2222,9 @@ function heel_instructions(stitch_count) {
   let str_count = to_string2(stitch_count);
   return p(
     toList([]),
-    toList([text("Hello " + str_count + " stitch sock.")])
+    toList([
+      text("Instructions for a " + str_count + " heel will go here.")
+    ])
   );
 }
 function view(model) {
