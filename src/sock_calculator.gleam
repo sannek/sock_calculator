@@ -1,5 +1,6 @@
 import gleam/int
 import gleam/result
+import gleam/string
 import lustre
 import lustre/attribute
 import lustre/effect.{type Effect}
@@ -78,6 +79,11 @@ fn view(model: Model) -> Element(Msg) {
     [attribute.style(styles)],
     ui.stack([], [
       html.h1([], [element.text("Let's knit a sock!")]),
+      html.p([], [
+        element.text(
+          "Instructions for a top-down sock with a reinforced heel flap and gusset.",
+        ),
+      ]),
       ui.aside(
         [aside.content_first(), aside.align_end()],
         ui.field(
@@ -96,7 +102,13 @@ fn view(model: Model) -> Element(Msg) {
           element.text("Calculate"),
         ]),
       ),
-      heel_instructions(model.stitch_count),
+      ui.prose([], [
+        html.h2([], [element.text("Cuff and Leg")]),
+        cuff_instructions(model.stitch_count),
+        leg_instructions(),
+        html.h2([], [element.text("Heel")]),
+        heel_instructions(model.stitch_count),
+      ]),
     ]),
   )
 }
@@ -114,11 +126,26 @@ fn do_get_stitch_count() -> Result(String, Nil) {
   Error(Nil)
 }
 
-// VIEW HELPERS ------------------------------------------------------------------------
+// TEXT HELPERS ------------------------------------------------------------------------
+
+fn cuff_instructions(stitch_count: Int) -> Element(Msg) {
+  let str_count = int.to_string(stitch_count)
+  let cuff =
+    "Cast on #stitch_count stitches. Divide evenly between DPNs and join to start knitting in the round. Work about 2cm in ribbing of your choice."
+  html.p([], [
+    element.text(string.replace(cuff, each: "#stitch_count", with: str_count)),
+  ])
+}
+
+fn leg_instructions() -> Element(Msg) {
+  let leg =
+    "Continue in stockinette (or the stitch pattern of your choice) until the leg has reached the desired length. I usually work 13-16cm before starting the heel, depending on size and patience."
+  html.p([], [element.text(leg)])
+}
 
 fn heel_instructions(stitch_count: Int) -> Element(Msg) {
   let str_count = int.to_string(stitch_count)
-  ui.prose([], [
-    html.p([], [element.text("Hello " <> str_count <> " stitch sock.")]),
+  html.p([], [
+    element.text("Instructions for a " <> str_count <> " heel will go here."),
   ])
 }

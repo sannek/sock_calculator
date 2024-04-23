@@ -338,8 +338,14 @@ function unwrap(result, default$) {
 function from_strings(strings) {
   return concat(strings);
 }
+function from_string(string3) {
+  return identity(string3);
+}
 function to_string(builder) {
   return identity(builder);
+}
+function replace(builder, pattern, substitute) {
+  return string_replace(builder, pattern, substitute);
 }
 
 // build/dev/javascript/gleam_stdlib/gleam/dynamic.mjs
@@ -1143,6 +1149,16 @@ function parse_int(value3) {
 function to_string3(term) {
   return term.toString();
 }
+function string_replace(string3, target, substitute) {
+  if (typeof string3.replaceAll !== "undefined") {
+    return string3.replaceAll(target, substitute);
+  }
+  return string3.replace(
+    // $& means the whole matched string
+    new RegExp(target.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"),
+    substitute
+  );
+}
 function concat(xs) {
   let result = "";
   for (const x of xs) {
@@ -1224,6 +1240,14 @@ function parse(string3) {
 }
 function to_string2(x) {
   return to_string3(x);
+}
+
+// build/dev/javascript/gleam_stdlib/gleam/string.mjs
+function replace2(string3, pattern, substitute) {
+  let _pipe = string3;
+  let _pipe$1 = from_string(_pipe);
+  let _pipe$2 = replace(_pipe$1, pattern, substitute);
+  return to_string(_pipe$2);
 }
 
 // build/dev/javascript/gleam_stdlib/gleam/bool.mjs
@@ -1780,6 +1804,9 @@ function start3(app, selector, flags) {
 function h1(attrs, children) {
   return element("h1", attrs, children);
 }
+function h2(attrs, children) {
+  return element("h2", attrs, children);
+}
 function div(attrs, children) {
   return element("div", attrs, children);
 }
@@ -2179,16 +2206,23 @@ function update2(model, msg) {
     return [model, none()];
   }
 }
+function cuff_instructions(stitch_count) {
+  let str_count = to_string2(stitch_count);
+  let cuff = "Cast on #stitch_count stitches. Divide evenly between DPNs and join to start knitting in the round. Work about 2cm in ribbing of your choice.";
+  return p(
+    toList([]),
+    toList([text(replace2(cuff, "#stitch_count", str_count))])
+  );
+}
+function leg_instructions() {
+  let leg = "Continue in stockinette (or the stitch pattern of your choice) until the leg has reached the desired length. I usually work 13-16cm before starting the heel, depending on size and patience.";
+  return p(toList([]), toList([text(leg)]));
+}
 function heel_instructions(stitch_count) {
   let str_count = to_string2(stitch_count);
-  return prose2(
+  return p(
     toList([]),
-    toList([
-      p(
-        toList([]),
-        toList([text("Hello " + str_count + " stitch sock.")])
-      )
-    ])
+    toList([text("Hello " + str_count + " stitch sock.")])
   );
 }
 function view(model) {
@@ -2203,6 +2237,14 @@ function view(model) {
       toList([]),
       toList([
         h1(toList([]), toList([text("Let's knit a sock!")])),
+        p(
+          toList([]),
+          toList([
+            text(
+              "Instructions for a top-down sock with a reinforced heel flap and gusset."
+            )
+          ])
+        ),
         aside2(
           toList([content_first(), align_end()]),
           field3(
@@ -2232,7 +2274,16 @@ function view(model) {
             toList([text("Calculate")])
           )
         ),
-        heel_instructions(model.stitch_count)
+        prose2(
+          toList([]),
+          toList([
+            h2(toList([]), toList([text("Cuff and Leg")])),
+            cuff_instructions(model.stitch_count),
+            leg_instructions(),
+            h2(toList([]), toList([text("Heel")])),
+            heel_instructions(model.stitch_count)
+          ])
+        )
       ])
     )
   );
@@ -2244,7 +2295,7 @@ function main() {
     throw makeError(
       "assignment_no_match",
       "sock_calculator",
-      16,
+      17,
       "main",
       "Assignment pattern did not match",
       { value: $ }
