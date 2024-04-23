@@ -29,6 +29,7 @@ fn init(_flags) -> #(Model, Effect(Msg)) {
 // UPDATE ----------------------------------------------------------------------
 
 pub opaque type Msg {
+  UserPressedKey(value: String)
   UserUpdatedStitchCount(value: String)
   UserSubmittedStitchCount
   UserResetStitchCount
@@ -37,6 +38,12 @@ pub opaque type Msg {
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
+    UserPressedKey("Enter") -> {
+      #(model, get_stitch_count())
+    }
+    UserPressedKey(_) -> {
+      #(model, effect.none())
+    }
     UserUpdatedStitchCount(value) -> {
       #(Model(..model, stitch_count_input: value), effect.none())
     }
@@ -81,6 +88,7 @@ fn view(model: Model) -> Element(Msg) {
             attribute.type_("number"),
             attribute.value(model.stitch_count_input),
             event.on_input(UserUpdatedStitchCount),
+            event.on_keydown(UserPressedKey),
           ]),
           [],
         ),

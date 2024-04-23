@@ -1808,6 +1808,16 @@ function on_click(msg) {
     return new Ok(msg);
   });
 }
+function on_keydown(msg) {
+  return on2(
+    "keydown",
+    (event2) => {
+      let _pipe = event2;
+      let _pipe$1 = field("key", string)(_pipe);
+      return map2(_pipe$1, msg);
+    }
+  );
+}
 function value2(event2) {
   let _pipe = event2;
   return field("target", field("value", string))(
@@ -2112,6 +2122,12 @@ var Model = class extends CustomType {
     this.stitch_count_input = stitch_count_input;
   }
 };
+var UserPressedKey = class extends CustomType {
+  constructor(value3) {
+    super();
+    this.value = value3;
+  }
+};
 var UserUpdatedStitchCount = class extends CustomType {
   constructor(value3) {
     super();
@@ -2141,7 +2157,11 @@ function get_stitch_count2() {
   );
 }
 function update2(model, msg) {
-  if (msg instanceof UserUpdatedStitchCount) {
+  if (msg instanceof UserPressedKey && msg.value === "Enter") {
+    return [model, get_stitch_count2()];
+  } else if (msg instanceof UserPressedKey) {
+    return [model, none()];
+  } else if (msg instanceof UserUpdatedStitchCount) {
     let value3 = msg.value;
     return [model.withFields({ stitch_count_input: value3 }), none()];
   } else if (msg instanceof UserSubmittedStitchCount) {
@@ -2196,6 +2216,11 @@ function view(model) {
                 on_input(
                   (var0) => {
                     return new UserUpdatedStitchCount(var0);
+                  }
+                ),
+                on_keydown(
+                  (var0) => {
+                    return new UserPressedKey(var0);
                   }
                 )
               ])
