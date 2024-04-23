@@ -1,25 +1,5 @@
-# sock_calculator
+# Sock Calculator
 
-[![Package Version](https://img.shields.io/hexpm/v/sock_calculator)](https://hex.pm/packages/sock_calculator)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/sock_calculator/)
+I'm tired of doing calculations and I wanted to try building something with [Gleam](https://gleam.run/) and [Lustre](https://hexdocs.pm/lustre/index.html). The result: a simple calculator that generates sock knitting instructions for any desired stitch count.
 
-```sh
-gleam add sock_calculator
-```
-```gleam
-import sock_calculator
-
-pub fn main() {
-  // TODO: An example of the project in use
-}
-```
-
-Further documentation can be found at <https://hexdocs.pm/sock_calculator>.
-
-## Development
-
-```sh
-gleam run   # Run the project
-gleam test  # Run the tests
-gleam shell # Run an Erlang shell
-```
+Currently only supports one type of sock and one type of heel, but more to follow, maybe?
