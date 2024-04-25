@@ -11,6 +11,6 @@
   },
   "devDependencies": {
     "vite": "^5.2.0",
-    "vite-gleam": "^0.4.1"
+    "vite-gleam": "^0.4.2"
   }
 }
