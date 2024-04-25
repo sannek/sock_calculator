@@ -8,6 +8,7 @@ import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 import lustre/ui
+import lustre/ui/button
 import lustre/ui/layout/aside
 
 // MAIN ------------------------------------------------------------------------
@@ -79,6 +80,7 @@ fn view(model: Model) -> Element(Msg) {
     [attribute.style(styles)],
     ui.stack([], [
       html.h1([], [element.text("Let's knit a sock!")]),
+      html.p([], [element.text("Work in progress!")]),
       html.p([], [
         element.text(
           "Instructions for a top-down sock with a reinforced heel flap and gusset.",
@@ -109,6 +111,14 @@ fn view(model: Model) -> Element(Msg) {
         html.h3([], [element.text("Heel")]),
         heel_flap_instructions(model.stitch_count),
       ]),
+      button.of(
+        html.a,
+        [
+          attribute.href("https://github.com/sannek/sock_calculator"),
+          attribute.target("_blank"),
+        ],
+        [element.text("View this project on GitHub")],
+      ),
     ]),
   )
 }
