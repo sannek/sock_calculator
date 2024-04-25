@@ -8,7 +8,6 @@ import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 import lustre/ui
-import lustre/ui/button
 import lustre/ui/layout/aside
 
 // MAIN ------------------------------------------------------------------------
@@ -110,15 +109,8 @@ fn view(model: Model) -> Element(Msg) {
         leg_instructions(),
         html.h3([], [element.text("Heel")]),
         heel_flap_instructions(model.stitch_count),
+        footer(),
       ]),
-      button.of(
-        html.a,
-        [
-          attribute.href("https://github.com/sannek/sock_calculator"),
-          attribute.target("_blank"),
-        ],
-        [element.text("View this project on GitHub")],
-      ),
     ]),
   )
 }
@@ -134,6 +126,25 @@ fn get_stitch_count() -> Effect(Msg) {
 @external(javascript, "./sock_calculator.ffi.mjs", "get_stitch_count")
 fn do_get_stitch_count() -> Result(String, Nil) {
   Error(Nil)
+}
+
+// VIEW HELPERS ------------------------------------------------------------------------
+
+fn footer() -> Element(Msg) {
+  html.p([], [
+    element.text("Created with "),
+    link("Gleam", "https://gleam.run/"),
+    element.text(" and "),
+    link("Lustre", "https://hexdocs.pm/lustre/index.html"),
+    element.text(". "),
+    element.text("Read about this project here. (soon). "),
+    element.text("View this project on "),
+    link("GitHub", "https://github.com/sannek/sock_calculator"),
+  ])
+}
+
+fn link(text: String, to: String) -> Element(Msg) {
+  html.a([attribute.href(to), attribute.target("_blank")], [element.text(text)])
 }
 
 // TEXT HELPERS ------------------------------------------------------------------------
