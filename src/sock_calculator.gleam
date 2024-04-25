@@ -103,11 +103,11 @@ fn view(model: Model) -> Element(Msg) {
         ]),
       ),
       ui.prose([], [
-        html.h2([], [element.text("Cuff and Leg")]),
+        html.h3([], [element.text("Cuff and Leg")]),
         cuff_instructions(model.stitch_count),
         leg_instructions(),
-        html.h2([], [element.text("Heel")]),
-        heel_instructions(model.stitch_count),
+        html.h3([], [element.text("Heel")]),
+        heel_flap_instructions(model.stitch_count),
       ]),
     ]),
   )
@@ -143,9 +143,32 @@ fn leg_instructions() -> Element(Msg) {
   html.p([], [element.text(leg)])
 }
 
-fn heel_instructions(stitch_count: Int) -> Element(Msg) {
-  let str_count = int.to_string(stitch_count)
-  html.p([], [
-    element.text("Instructions for a " <> str_count <> " heel will go here."),
+fn heel_flap_instructions(stitch_count: Int) -> Element(Msg) {
+  // Half of the total stitches, rounded down
+  let heel_st_count = stitch_count / 2
+  let heel_flap_rows = { heel_st_count / 2 } - 1
+
+  let intro =
+    "The heel flap is worked back and forth over the first #heel_st_count stitches. Repeat the two rows below a total #heel_flap_rows times, ending with a WS row."
+    |> string.replace(
+      each: "#heel_st_count",
+      with: int.to_string(heel_st_count),
+    )
+    |> string.replace(
+      each: "#heel_flap_rows",
+      with: int.to_string(heel_flap_rows),
+    )
+
+  let #(row_1, row_2) = case heel_st_count % 2 {
+    0 -> #("*sl1, k1*", "sl1, p to end")
+    _ -> #("*sl1, k1*, k1", "sl1, p to end")
+  }
+
+  html.div([], [
+    html.p([], [element.text(intro)]),
+    html.ol([], [
+      html.li([], [element.text(row_1)]),
+      html.li([], [element.text(row_2)]),
+    ]),
   ])
 }
