@@ -132,13 +132,13 @@ fn do_get_stitch_count() -> Result(String, Nil) {
 
 fn footer() -> Element(Msg) {
   html.p([], [
+    element.text("You can read about this project here. (soon). "),
     element.text("Created with "),
     link("Gleam", "https://gleam.run/"),
     element.text(" and "),
     link("Lustre", "https://hexdocs.pm/lustre/index.html"),
     element.text(". "),
-    element.text("Read about this project here. (soon). "),
-    element.text("View this project on "),
+    element.text("View on "),
     link("GitHub", "https://github.com/sannek/sock_calculator"),
   ])
 }
@@ -180,16 +180,16 @@ fn heel_flap_instructions(stitch_count: Int) -> Element(Msg) {
       with: int.to_string(heel_flap_rows),
     )
 
-  let #(row_1, row_2) = case heel_st_count % 2 {
-    0 -> #("*sl1, k1*", "sl1, p to end")
-    _ -> #("*sl1, k1*, k1", "sl1, p to end")
+  let row_1 = case heel_st_count % 2 {
+    0 -> "*sl1, k1*"
+    _ -> "*sl1, k1*, k1"
   }
 
   html.div([], [
     html.p([], [element.text(intro)]),
-    html.ol([], [
+    html.ol([attribute.class("pattern-rows")], [
       html.li([], [element.text(row_1)]),
-      html.li([], [element.text(row_2)]),
+      html.li([], [element.text("sl1, p to end")]),
     ]),
   ])
 }

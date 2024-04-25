@@ -1,3 +1,25 @@
 h1 {
   font-size: 2rem;
 }
+
+ol.pattern-rows {
+  list-style: none !important;
+  counter-reset: item;
+}
+
+ol.pattern-rows li {
+  counter-increment: item;
+}
+
+ol.pattern-rows li::before {
+  font-style: italic;
+  margin-right: 0.5rem
+}
+
+ol.pattern-rows li:nth-child(odd)::before {
+  content: "Row " counter(item) " (RS):";
+}
+
+ol.pattern-rows li:nth-child(even)::before {
+  content: "Row " counter(item) " (WS):";
+}
