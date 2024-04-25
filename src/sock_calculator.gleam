@@ -34,7 +34,7 @@ pub opaque type Msg {
   UserUpdatedStitchCount(value: String)
   UserSubmittedStitchCount
   UserResetStitchCount
-  GotSubmittedStitchCount(value: String)
+  GotSubmittedStitchCount(Result(String, Nil))
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -55,7 +55,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       Model(stitch_count: 60, stitch_count_input: "60"),
       effect.none(),
     )
-    GotSubmittedStitchCount(value) -> {
+    GotSubmittedStitchCount(Ok(value)) -> {
       let stitch_count =
         int.parse(value)
         |> result.unwrap(60)
@@ -64,9 +64,9 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         effect.none(),
       )
     }
-    // GotSubmittedStitchCount(Error(_)) -> {
-  //   #(model, effect.none())
-  // }
+    GotSubmittedStitchCount(Error(_)) -> {
+      #(model, effect.none())
+    }
   }
 }
 
@@ -122,8 +122,8 @@ fn get_stitch_count() -> Effect(Msg) {
 }
 
 @external(javascript, "./sock_calculator.ffi.mjs", "get_stitch_count")
-fn do_get_stitch_count() -> String {
-  "25"
+fn do_get_stitch_count() -> Result(String, Nil) {
+  Error(Nil)
 }
 
 // TEXT HELPERS ------------------------------------------------------------------------
