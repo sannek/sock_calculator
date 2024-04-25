@@ -109,6 +109,7 @@ fn view(model: Model) -> Element(Msg) {
         leg_instructions(),
         html.h3([], [element.text("Heel")]),
         heel_flap_instructions(model.stitch_count),
+        heel_turn_instructions(model.stitch_count),
         footer(),
       ]),
     ]),
@@ -190,6 +191,34 @@ fn heel_flap_instructions(stitch_count: Int) -> Element(Msg) {
     html.ol([attribute.class("pattern-rows")], [
       html.li([], [element.text(row_1)]),
       html.li([], [element.text("sl1, p to end")]),
+    ]),
+  ])
+}
+
+fn heel_turn_instructions(stitch_count: Int) -> Element(Msg) {
+  let heel_st_count = stitch_count / 2
+  let half_heel_st_count = heel_st_count / 2
+  let extra = 3 - { half_heel_st_count % 2 }
+
+  // verify this next time you turn a heel
+  let row_two_count = extra * 2 + { half_heel_st_count % 2 } + 1
+
+  let row_one =
+    "sl1, k" <> int.to_string(half_heel_st_count + extra) <> ", ssk, k1, turn"
+  let row_two = "sl1, p" <> int.to_string(row_two_count) <> ", ssk, k1, turn"
+
+  html.div([], [
+    html.p([], [element.text("Lets turn the heel!")]),
+    html.ol([attribute.class("pattern-rows")], [
+      html.li([], [element.text(row_one)]),
+      html.li([], [element.text(row_two)]),
+      html.li([], [element.text("sl1, k to 1 stitch before gap, ssk, k1, turn")]),
+      html.li([], [
+        element.text("sl1, p to 1 stitch before gap, p2tog, p1, turn"),
+      ]),
+    ]),
+    html.p([], [
+      element.text("Repeat row 3 and 4 until all stitches have been worked."),
     ]),
   ])
 }
