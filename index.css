@@ -2,6 +2,10 @@ h1 {
   font-size: 2rem;
 }
 
+summary {
+  font-size: 1.5rem;
+}
+
 ol.pattern-rows {
   list-style: none !important;
   counter-reset: item;

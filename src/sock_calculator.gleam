@@ -73,17 +73,22 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 // VIEW ------------------------------------------------------------------------
 
 fn view(model: Model) -> Element(Msg) {
-  let styles = [#("width", "100vw"), #("height", "100vh"), #("padding", "1rem")]
+  let styles = [
+    #("width", "100vw"),
+    #("min-height", "100vh"),
+    #("padding", "1rem"),
+  ]
 
   ui.centre(
     [attribute.style(styles)],
     ui.stack([], [
-      html.h1([], [element.text("Let's knit a sock!")]),
-      html.p([], [element.text("Work in progress!")]),
-      html.p([], [
-        element.text(
-          "Instructions for a top-down sock with a reinforced heel flap and gusset.",
-        ),
+      html.div([], [
+        html.h1([], [element.text("Let's knit a sock!")]),
+        html.p([], [
+          element.text(
+            "Instructions for a top-down sock with a reinforced heel flap and gusset.",
+          ),
+        ]),
       ]),
       ui.aside(
         [aside.content_first(), aside.align_end()],
@@ -104,12 +109,15 @@ fn view(model: Model) -> Element(Msg) {
         ]),
       ),
       ui.prose([], [
-        html.h3([], [element.text("Cuff and Leg")]),
-        cuff_instructions(model.stitch_count),
-        leg_instructions(),
-        html.h3([], [element.text("Heel")]),
-        heel_flap_instructions(model.stitch_count),
-        heel_turn_instructions(model.stitch_count),
+        collapsible("Cuff & Leg", [
+          cuff_instructions(model.stitch_count),
+          leg_instructions(),
+        ]),
+        collapsible("Heel", [
+          heel_flap_instructions(model.stitch_count),
+          heel_turn_instructions(model.stitch_count),
+        ]),
+        html.h3([], [element.text("Gusset & Foot")]),
         footer(),
       ]),
     ]),
@@ -146,6 +154,13 @@ fn footer() -> Element(Msg) {
 
 fn link(text: String, to: String) -> Element(Msg) {
   html.a([attribute.href(to), attribute.target("_blank")], [element.text(text)])
+}
+
+fn collapsible(summary: String, children: List(Element(Msg))) -> Element(Msg) {
+  html.details([attribute.attribute("open", "true")], [
+    html.summary([], [element.text(summary)]),
+    ..children
+  ])
 }
 
 // TEXT HELPERS ------------------------------------------------------------------------
