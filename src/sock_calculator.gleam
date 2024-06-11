@@ -74,8 +74,9 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 
 fn view(model: Model) -> Element(Msg) {
   let styles = [
-    #("width", "100vw"),
+    #("max-width", "60ch"),
     #("min-height", "100vh"),
+    #("margin", "0 auto"),
     #("padding", "1rem"),
   ]
 
@@ -91,7 +92,7 @@ fn view(model: Model) -> Element(Msg) {
         ]),
       ]),
       ui.aside(
-        [aside.content_first(), aside.align_end()],
+        [aside.align_end()],
         ui.field(
           [],
           [element.text("How many stitches?")],
